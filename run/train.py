@@ -46,7 +46,12 @@ def main(cfg: TrainConfig):
     model_summary = RichModelSummary(max_depth=2)
 
     # init experiment logger
-
+    pl_logger = WandbLogger(
+        name=cfg.exp_name,
+        project="child-mind-institute-detect-sleep-states",
+    )
+    pl_logger.log_hyperparams(cfg)
+    
     trainer = Trainer(
         # env
         default_root_dir=Path.cwd(),
@@ -61,6 +66,7 @@ def main(cfg: TrainConfig):
         accumulate_grad_batches=cfg.trainer.accumulate_grad_batches,
         callbacks=[checkpoint_cb, lr_monitor, progress_bar, model_summary],
         # resume_from_checkpoint=resume_from,
+        logger=pl_logger,
         num_sanity_val_steps=0,
         log_every_n_steps=int(len(datamodule.train_dataloader()) * 0.1),
         sync_batchnorm=True,
