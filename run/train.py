@@ -10,11 +10,10 @@ from pytorch_lightning.callbacks import (
     RichModelSummary,
     RichProgressBar,
 )
-
+from pytorch_lightning.loggers import WandbLogger
 from src.conf import TrainConfig
 from src.datamodule import SleepDataModule
 from src.modelmodule import PLSleepModel
-
 
 
 @hydra.main(config_path="conf", config_name="train", version_base="1.2")
@@ -40,7 +39,11 @@ def main(cfg: TrainConfig):
     model_summary = RichModelSummary(max_depth=2)
 
 
-
+    pl_logger = WandbLogger(
+        name=cfg.exp_name,
+        project="child-mind-institute-detect-sleep-states",
+    )
+    pl_logger.log_hyperparams(cfg)
 
     trainer = Trainer(
         # env
@@ -55,6 +58,7 @@ def main(cfg: TrainConfig):
         gradient_clip_val=cfg.trainer.gradient_clip_val,
         accumulate_grad_batches=cfg.trainer.accumulate_grad_batches,
         callbacks=[checkpoint_cb, lr_monitor, progress_bar, model_summary],
+        logger=pl_logger,
         # resume_from_checkpoint=resume_from,
         num_sanity_val_steps=0,
         sync_batchnorm=True,
