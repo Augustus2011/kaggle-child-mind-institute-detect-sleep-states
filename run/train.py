@@ -15,10 +15,6 @@ from src.conf import TrainConfig
 from src.datamodule import SleepDataModule
 from src.modelmodule import PLSleepModel
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s:%(name)s - %(message)s"
-)
-LOGGER = logging.getLogger(Path(__file__).name)
 
 
 @hydra.main(config_path="conf", config_name="train", version_base="1.2")
@@ -27,7 +23,6 @@ def main(cfg: TrainConfig):
 
     # init lightning model
     datamodule = SleepDataModule(cfg)
-    LOGGER.info("Set Up DataModule")
     model = PLSleepModel(
         cfg, datamodule.valid_event_df, len(cfg.features), len(cfg.labels), cfg.duration
     )
@@ -44,7 +39,7 @@ def main(cfg: TrainConfig):
     progress_bar = RichProgressBar()
     model_summary = RichModelSummary(max_depth=2)
 
-    # init experiment logger
+
 
 
     trainer = Trainer(
@@ -62,7 +57,6 @@ def main(cfg: TrainConfig):
         callbacks=[checkpoint_cb, lr_monitor, progress_bar, model_summary],
         # resume_from_checkpoint=resume_from,
         num_sanity_val_steps=0,
-        log_every_n_steps=int(len(datamodule.train_dataloader()) * 0.1),
         sync_batchnorm=True,
         check_val_every_n_epoch=cfg.trainer.check_val_every_n_epoch,
     )
@@ -79,7 +73,6 @@ def main(cfg: TrainConfig):
         duration=cfg.duration,
     )
     weights_path = str("model_weights.pth")  # type: ignore
-    LOGGER.info(f"Extracting and saving best weights: {weights_path}")
     torch.save(model.model.state_dict(), weights_path)
 
     return
