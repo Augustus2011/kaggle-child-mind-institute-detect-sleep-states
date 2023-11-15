@@ -76,7 +76,7 @@ def main(cfg: TrainConfig):
     trainer.fit(model, datamodule=datamodule)
 
     # load best weights
-    model = model.load_from_checkpoint(
+    model = PLSleepModel.load_from_checkpoint(
         checkpoint_cb.best_model_path,
         cfg=cfg,
         val_event_df=datamodule.valid_event_df,
