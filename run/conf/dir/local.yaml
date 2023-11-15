@@ -1,5 +1,5 @@
 data_dir: /content/kaggle/data
-processed_dir: /content/kaggle/processed_data/content/kaggle/processed_data/train
+processed_dir: /content/kaggle/processed_data/content/kaggle/processed_data/
 output_dir: /content/kaggle/output
 model_dir: /content/kagglet/output/train
 sub_dir: ./
